@@ -1,6 +1,11 @@
-﻿namespace BookCart.Service
+﻿using PayPal.v1.Payments;
+using BookCart.Models;
+
+namespace BookCart.Service
 {
-    public class Ipaypalservice
+    public interface Ipaypalservice
     {
+        Task<string> CreatePaymentUrl(PaymentInformation model, HttpContext context);
+        PaymentResponse PaymentExecute(IQueryCollection collections);
     }
 }

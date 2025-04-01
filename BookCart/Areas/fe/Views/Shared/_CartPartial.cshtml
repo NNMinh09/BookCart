@@ -1,9 +1,12 @@
-﻿@using BookCart.Dto
+﻿@model BookCart.Models.PaymentInformation
+@using BookCart.Dto
 @using Microsoft.AspNetCore.Http
 @using Newtonsoft.Json
 @inject IHttpContextAccessor HttpContextAccessor
 
 @{
+    ViewData["Title"] = "Checkout";
+
     var session = HttpContextAccessor.HttpContext!.Session;
     string? jsoncart = session.GetString(BookCart.Areas.fe.Controllers.HomeController.CARTKEY);
     List<CartDto>? cart = null;
@@ -13,57 +16,161 @@
     }
     decimal total = 0;
 }
-<!--mini cart-->
-<div class="mini_cart">
-    <div class="cart_gallery">
-        <div class="cart_close">
-            <div class="cart_text">
-                <h3>cart</h3>
-            </div>
-            <div class="mini_cart_close">
-                <a href="javascript:void(0)"><i class="icon-close icons"></i></a>
-            </div>
-        </div>
-        @if (cart != null)
-        {
-            foreach (var item in cart)
-            {
-                total = item.Quantity * item.Item!.Price!.Value;
 
-                <div class="cart_item">
-                    <div class="cart_img">
-                        <a href="/fe/home/bookdetails/@item.Item!.Id"><img src="/images/@item.Item.Image" alt="@item.Item.Title"></a>
-                    </div>
-                    <div class="cart_info">
-                        <a href="#">Primis In Faucibus</a>
-                        <p>@item.Quantity x <span> @item.Item.Price đ </span></p>
-                    </div>
-                    <div class="cart_remove">
-                        <a href="/fe/home/removecart/@item.Item.Id"><i class="icon-close icons"></i></a>
-                    </div>
+<!--breadcrumbs area start-->
+<div class="breadcrumbs_area breadcrumbs_other">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="breadcrumb_content text-center">
+                    <ul>
+                        <li><a href="/fe">home</a></li>
+                        <li><a href="#">Checkout</a></li>
+                    </ul>
+                    <h3>checkout</h3>
                 </div>
-            }
-        }
-    </div>
-    <div class="mini_cart_table">
-        <div class="cart_table_border">
-            @* <div class="cart_total"> *@
-            @*     <span>Sub total:</span> *@
-            @*     <span class="price">$125.00</span> *@
-            @* </div> *@
-            <div class="cart_total mt-10">
-                <span>total:</span>
-                <span class="price">@total đ</span>
             </div>
-        </div>
-    </div>
-    <div class="mini_cart_footer">
-        <div class="cart_button">
-            <a href="/fe/home/viewcart"><i class="fa fa-shopping-cart"></i> View cart</a>
-        </div>
-        <div class="cart_button">
-            <a href="/fe/home/checkout"><i class="fa fa-sign-in"></i> Checkout</a>
         </div>
     </div>
 </div>
-<!--mini cart end-->
+<!--breadcrumbs area end-->
+<!--Checkout page section-->
+<div class="checkout_section" id="accordion">
+    <div class="container">
+        <div class="returning_coupon_area">
+            <div class="row">
+                <div class="col-lg-7 col-md-6">
+                    <div class="user-actions">
+                        <h3>
+                            <i class="fa fa-comment-o" aria-hidden="true"></i>
+                            Returning customer?
+                            <a class="Returning" href="#" data-toggle="collapse" data-target="#checkout_login" aria-expanded="true">Click here to login</a>
+                        </h3>
+                        <div id="checkout_login" class="collapse" data-parent="#accordion">
+                            <div class="checkout_info">
+                                <p>If you have shopped with us before, please enter your details in the boxes below.</p>
+                                <form action="#">
+                                    <div class="form_group">
+                                        <label>Username or email <span>*</span></label>
+                                        <input type="text">
+                                    </div>
+                                    <div class="form_group">
+                                        <label>Password  <span>*</span></label>
+                                        <input type="password">
+                                    </div>
+                                    <div class="form_group group_3">
+                                        <button class="btn btn-primary" type="submit">Login</button>
+                                        <label for="remember_box">
+                                            <input id="remember_box" type="checkbox">
+                                            <span> Remember me </span>
+                                        </label>
+                                    </div>
+                                    <a href="#">Lost your password?</a>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5 col-md-6">
+                    <div class="user-actions">
+                        <h3>
+                            <i class="fa fa-comment-o" aria-hidden="true"></i>
+                            Have a Coupon ?
+                            <a class="Returning" href="#" data-toggle="collapse" data-target="#checkout_coupon2" aria-expanded="true">Click here to enter your code</a>
+                        </h3>
+                        <div id="checkout_coupon2" class="collapse" data-parent="#accordion">
+                            <div class="checkout_info coupon_info">
+                                <form action="#">
+                                    <input placeholder="Coupon code" type="text">
+                                    <button class="btn btn-primary" type="submit">Apply coupon</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="checkout_form">
+            <form asp-action="ConfirmCheckout" asp-controller="Order" method="post">
+                @Html.AntiForgeryToken()
+                <div class="row">
+                    <div class="col-lg-7 col-md-6">
+                        <h3>Billing Details</h3>
+                        <div class="checkout_form_input">
+                            <label asp-for="Country">Country <span>*</span></label>
+                            <select asp-for="Country" class="select_option">
+                                <option>United Kingdom (UK)</option>
+                                <option>Algeria</option>
+                                <option>Afghanistan</option>
+                                <option>Ghana</option>
+                                <option>Albania</option>
+                                <option>Bahrain</option>
+                                <option>Colombia</option>
+                                <option>Dominican Republic</option>
+                            </select>
+                        </div>
+                        <div class="checkout_form_input">
+                            <label asp-for="FirstName">First Name <span>*</span></label>
+                            <input asp-for="FirstName" class="form-control" />
+                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                        </div>
+                        <div class="checkout_form_input">
+                            <label asp-for="LastName">Last Name <span>*</span></label>
+                            <input asp-for="LastName" class="form-control" />
+                            <span asp-validation-for="LastName" class="text-danger"></span>
+                        </div>
+                        <div class="checkout_form_input">
+                            <label asp-for="CompanyName">Company Name</label>
+                            <input asp-for="CompanyName" class="form-control" />
+                        </div>
+                        <div class="checkout_form_input">
+                            <label asp-for="Address">Address <span>*</span></label>
+                            <input asp-for="Address" class="form-control" />
+                            <span asp-validation-for="Address" class="text-danger"></span>
+                        </div>
+                        <div class="checkout_form_input">
+                            <label asp-for="Phone">Phone <span>*</span></label>
+                            <input asp-for="Phone" class="form-control" />
+                            <span asp-validation-for="Phone" class="text-danger"></span>
+                        </div>
+                        <div class="checkout_form_input">
+                            <label asp-for="Email">Email <span>*</span></label>
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                        <div class="order_button">
+                            <button type="submit" class="btn btn-primary">Place Order</button>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-5 col-md-6">
+                        <div class="order_summary">
+                            <h3>Your Order</h3>
+                            <ul>
+                                @if (cart != null)
+                                {
+                                    foreach (var item in cart)
+                                    {
+                                        var itemTotal = item.price * item.quantity;
+                                        total += itemTotal;
+                                        <li>@item.bookTitle × @item.quantity <span>@itemTotal ₫</span></li>
+                                    }
+                                }
+                                else
+                                {
+                                    <li>Your cart is empty.</li>
+                                }
+                                <li><strong>Total:</strong> <span><strong>@total ₫</strong></span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
